@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "xoa-container"
+version = "0.1.0"
+description = ""
+authors = ["dennis <it.admin@elnissi.co.id>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyyaml = "^6.0.1"
+pydantic = "^2.6.4"
+xoadmin = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

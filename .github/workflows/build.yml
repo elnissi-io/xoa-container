@@ -1,0 +1,53 @@
+name: Build xoa-container
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - 'README.md'
+      - 'docker-compose.yml'
+      - '.github/**'
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - 'README.md'
+      - 'docker-compose.yml'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_ELNISSI_USER_XOA }}
+          password: ${{ secrets.QUAY_ELNISSI_TOKEN_XOA }}
+
+      - name: Get xo-server version
+        id: xo-version
+        run: |
+          echo "XO_VERSION=$(curl -s https://raw.githubusercontent.com/vatesfr/xen-orchestra/master/packages/xo-server/package.json | jq -r .version)" >> $GITHUB_ENV
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            quay.io/elnissi-io/xoa-container:latest
+            quay.io/elnissi-io/xoa-container:${{ env.XO_VERSION }}
