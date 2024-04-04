@@ -41,8 +41,42 @@ function check_xo_ready {
 	exit 1
 }
 
+function deleteUserByEmail() {
+	# The email address of the user to delete
+	local USER_EMAIL="$1"
+
+	# Check if an email address is provided
+	if [ -z "$USER_EMAIL" ]; then
+		echo "Usage: deleteUserByEmail <user-email>"
+		return 1
+	fi
+
+	# Get the user ID for the given email address using jq for JSON parsing
+	local USER_ID=$(xoadmin user list --format json | jq -r --arg email "$USER_EMAIL" '.[] | select(.email==$email) | .id')
+
+	# Check if the user ID was found
+	if [ -z "$USER_ID" ]; then
+		echo "Error: User not found."
+		return 2
+	fi
+
+	# Delete the user by ID
+	xoadmin user delete "$USER_ID"
+
+	echo "User $USER_EMAIL deleted successfully."
+}
+
 check_xo_ready
-/usr/bin/python3 /scripts/xoa_init.py --config /conf.yaml
+mkdir $HOME/.xoadmin
+
+alias xoadmin="/usr/bin/python3 -m xoadmin"
+
+xoadmin config generate -o $HOME/.xoadmin/config
+xoadmin apply -f /conf.yaml
+xoadmin user create $XO_ADMIN_USER $XO_ADMIN_PASSWORD --permission admin
+deleteUserByEmail admin@admin.net
+xoadmin config set username --from-env --env-var XO_ADMIN_USER
+xoadmin config set password --from-env --env-var XO_ADMIN_PASSWORD
 
 echo "OK."
 
