@@ -52,8 +52,8 @@ COPY conf/monit-services /etc/monit/conf.d/services
 COPY conf.yaml /conf.yaml
 
 # Clone xoadmin with specific tag v1.1.0
-RUN git clone --branch v1.1.0 --depth 1 https://github.com/elnissi-io/xoadmin /xoadmin
-RUN cd /xoadmin && pip install .
+RUN git clone --branch v1.2.4 --depth 1 https://github.com/elnissi-io/xoadmin /xoadmin
+RUN cd /xoadmin && pip install . --ignore-requires-python
 
 COPY run.sh /run.sh
 COPY scripts /scripts
