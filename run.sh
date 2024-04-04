@@ -72,11 +72,12 @@ mkdir $HOME/.xoadmin
 alias xoadmin="/usr/bin/python3 -m xoadmin"
 
 xoadmin config generate -o $HOME/.xoadmin/config
-xoadmin apply -f /conf.yaml
 xoadmin user create $XO_ADMIN_USER $XO_ADMIN_PASSWORD --permission admin
-deleteUserByEmail admin@admin.net
 xoadmin config set username --from-env --env-var XO_ADMIN_USER
 xoadmin config set password --from-env --env-var XO_ADMIN_PASSWORD
+deleteUserByEmail admin@admin.net
+
+xoadmin apply -f /conf.yaml
 
 echo "OK."
 
