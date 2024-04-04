@@ -56,7 +56,6 @@ RUN git clone --branch v1.2.4 --depth 1 https://github.com/elnissi-io/xoadmin /x
 RUN cd /xoadmin && pip install . --ignore-requires-python
 
 COPY run.sh /run.sh
-COPY scripts /scripts
 RUN chmod +x /run.sh
 
 CMD ["sh", "-c", "cd /etc/xen-orchestra/packages/xo-server && /run.sh"]
