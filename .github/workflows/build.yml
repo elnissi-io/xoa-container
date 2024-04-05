@@ -3,18 +3,20 @@ name: Build xoa-container
 on:
   push:
     branches:
-      - 'master'
+      - main
+    tags:
+      - 'v*'
     paths-ignore:
-      - 'README.md'
-      - 'docker-compose.yml'
-      - '.github/**'
+      - README.md
+      - docker-compose.yml
+      - .github/**
   pull_request:
     branches:
-      - 'master'
+      - main
     paths-ignore:
-      - 'README.md'
-      - 'docker-compose.yml'
-      - '.github/**'
+      - README.md
+      - docker-compose.yml
+      - .github/**
   workflow_dispatch:
 
 jobs:
@@ -38,16 +40,23 @@ jobs:
           password: ${{ secrets.QUAY_ELNISSI_TOKEN_XOA }}
 
       - name: Get xo-server version
-        id: xo-version
         run: |
           echo "XO_VERSION=$(curl -s https://raw.githubusercontent.com/vatesfr/xen-orchestra/master/packages/xo-server/package.json | jq -r .version)" >> $GITHUB_ENV
 
-      - name: Build and push image
+      - name: Prepare ref name
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          REF_NAME=$(echo ${GITHUB_REF#refs/tags/} | sed 's/\//-/g')
+          echo "REF_NAME=${REF_NAME}" >> $GITHUB_ENV
+
+      - name: Build (and optionally push) image
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
-          push: true
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: |
             quay.io/elnissi-io/xoa-container:latest
-            quay.io/elnissi-io/xoa-container:${{ env.XO_VERSION }}
+            quay.io/elnissi-io/xoa-container:${{ env.REF_NAME }}-${{ env.XO_VERSION }}
+          build-args: |
+            XO_VERSION=${{ env.XO_VERSION }}
