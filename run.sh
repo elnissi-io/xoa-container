@@ -7,7 +7,7 @@ function StopProcesses {
 	done
 	exit 0
 }
-
+DEFAULT_USER=admin@admin.net
 set -a
 HTTP_PORT=${HTTP_PORT:-"80"}
 CERT_PATH=${CERT_PATH:-\'./temp-cert.pem\'}
@@ -51,6 +51,12 @@ function deleteUserByEmail() {
 		return 1
 	fi
 
+	# Prevent deletion if the user to delete is the same as the default user
+	if [ "$USER_EMAIL" == "$DEFAULT_USER" ]; then
+		echo "The provided user ($USER_EMAIL) is the default user and will not be deleted."
+		return 0
+	fi
+
 	# Get the user ID for the given email address using jq for JSON parsing
 	local USER_ID=$(xoadmin user list --format json | jq -r --arg email "$USER_EMAIL" '.[] | select(.email==$email) | .id')
 
@@ -61,9 +67,9 @@ function deleteUserByEmail() {
 	fi
 
 	# Delete the user by ID
+	echo "Executing $USER_EMAIL delete..."
 	xoadmin user delete "$USER_ID"
 
-	echo "User $USER_EMAIL deleted successfully."
 }
 
 check_xo_ready
@@ -75,7 +81,7 @@ xoadmin config generate -o $HOME/.xoadmin/config
 xoadmin user create $XO_ADMIN_USER $XO_ADMIN_PASSWORD --permission admin
 xoadmin config set username --from-env --env-var XO_ADMIN_USER
 xoadmin config set password --from-env --env-var XO_ADMIN_PASSWORD
-deleteUserByEmail admin@admin.net
+deleteUserByEmail $DEFAULT_USER
 
 xoadmin apply -f /conf.yaml
 

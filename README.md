@@ -61,19 +61,45 @@ docker run -itd \
   -p 80:80 \
   -v /path/to/data/xo-server:/var/lib/xo-server \
   -v /path/to/data/redis:/var/lib/redis \
-  elnissi-io/xoa-container
+  quay.io/elnissi-io/xoa-container
 ```
 
 You may also use Docker Compose. Copy the configuration from the example `docker-compose.yml` from the GitHub repository.
 
-### Variables
+## Configuration
+
+### conf.yaml provisioning
+
+The `conf.yaml` will be applied using `xoadmin`.
+
+```yaml
+hypervisors:
+  - host: your-hypervisor
+    username: user
+    password: password
+    allowUnauthorized: true
+
+users:
+  - username: sa-terraform
+    password: sa-terraform-password
+    permission: admin
+```
+### Administrator Account
+
+- `XO_ADMIN_USER`: User account to use as default during container creation.
+- `XO_ADMIN_PASSWORD`: User account password to use as default during container creation.
+
+`run.sh` creates a new admin user account and applies the configuration specified under `conf.yml` using the `xoadmin` cli.
+
+This is particularly useful when provisioning a user account for an XOA instance for Terraform to use for instance.
+
+### XOA Settings
 
 - `HTTP_PORT`: Listening HTTP port inside the container.
 - `HTTPS_PORT`: Listening HTTPS port inside the container.
 - `REDIRECT_TO_HTTPS`: Boolean value `true`/`false`. If set to `true`, it will redirect any HTTP traffic to HTTPS. Requires that `HTTPS_PORT` is set. Defaults to: `false`.
 - `CERT_PATH`: Path inside the container for the user-specified PEM certificate file. Example: `'/path/to/cert'`. Note: single quotes are part of the value and mandatory!
 - `KEY_PATH`: Path inside the container for the user-specified key file. Example
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
