@@ -51,9 +51,10 @@ function deleteUserByEmail() {
 		return 1
 	fi
 
-	# Prevent deletion if the user to delete is the same as the default user
-	if [ "$USER_EMAIL" == "$DEFAULT_USER" ]; then
-		echo "The provided user ($USER_EMAIL) is the default user and will not be deleted."
+	# Prevent deletion if the user to delete is the same as the provided user
+	if [ "$USER_EMAIL" == "$XO_ADMIN_USER" ]; then
+		echo "The provided user ($USER_EMAIL) is the same name as $XO_ADMIN_USER."
+		echo "Deletion aborted"
 		return 0
 	fi
 
