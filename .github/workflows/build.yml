@@ -50,7 +50,7 @@ jobs:
           echo "REF_NAME=${REF_NAME}" >> $GITHUB_ENV
 
       - name: Build (and optionally push) image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
